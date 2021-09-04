@@ -63,39 +63,45 @@ function login($email,$password){
 	$k=$authorization['password'];
 
 	if(password_verify($password,$k)){
-										$_SESSION['user']=$_POST['email'];
+										$_SESSION['login']=$authorization;
+										$_SESSION['id']=$authorization['id'];
 										redirect_to('users.php');
 
 									}
 										else{
 												set_flash_message('danger','неправильно набран логин или пароль');
 												redirect_to('page_login.php');
-												unset($_SESSION['user']);
+												unset($_SESSION['login']);
 											exit;
 											}
-	return $k;
+
+
 }
 
-function is_not_login($email,$password){
-	$pdo= new PDO('mysql:host=localhost;dbname=register','root','');
-	$sql='SELECT*FROM users WHERE email=:email';
-	$statement=$pdo->prepare($sql);
-	$statement->execute(['email'=>$email]);
-	$authorization=$statement->fetch(PDO::FETCH_ASSOC);
-	$hash=$authorization['password'];
-	if(!password_verify($password,$hash)){
 
-											redirect_to("page_login.php");
-										}
-											else{
-													redirect_to('users.php');
-											exit;
-												}
 
-											return $hash;
+function is_not_login($name){ if(empty($_SESSION[$name])){ redirect_to('page_login.php');}}
+
+
+
+//if ($_SESSION['role']=='admin'){}
+
+function data(){
+				$pdo= new PDO('mysql:host=localhost;dbname=register','root','');
+				$sql='SELECT email FROM users WHERE id={$_SESSION["id"]}';
+				$statement=$pdo->prepare($sql);
+				$statement->execute();
+				$st=$statement->fetch(PDO::FETCH_ASSOC);
+				return $st;
 }
 
-//function is_not_login($email,$password){ if (!isset($_SESSION['user'])){redirect_to("page_login.php");}
+
+
+
+
+
+
+
 
 
 
