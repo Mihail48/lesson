@@ -15,18 +15,23 @@ function get_user_by_email($email){
 	return $peopls;
 }
 
-//добавляет нового пользователя
-function add_user($email,$password){
 
+//добавляет нового пользователя
+function add_user($email,$password,$role){
+	$role=NULL;
 	$pdo=new PDO('mysql:host=localhost;dbname=register', "root" , "");
-	$sql ='INSERT INTO users(email,password) VALUES(:email,:password)';
+	$sql ='INSERT INTO users(email,password,role) VALUES(:email,:password,:role)';
 
 	$statement=$pdo->prepare($sql);
 
 	$statement->execute(['email'=>$email,
-					'password'=>password_hash($password, PASSWORD_DEFAULT)]);
+						'password'=>password_hash($password, PASSWORD_DEFAULT),
+						'role'=>$role]);
 
-	return $pdo->lastInsertId();
+	 $last_id=$pdo->lastInsertId();
+	 return $last_id;
+
+
 }
 
 function set_flash_message($name,$message){
@@ -72,6 +77,7 @@ function login($email,$password){
 												set_flash_message('danger','неправильно набран логин или пароль');
 												redirect_to('page_login.php');
 												unset($_SESSION['login']);
+												unset($_SESSION['id']);
 											exit;
 											}
 
@@ -84,15 +90,69 @@ function is_not_login($name){ if(empty($_SESSION[$name])){ redirect_to('page_log
 
 
 
-//if ($_SESSION['role']=='admin'){}
 
-function data(){
+
+function pull_id(){
 				$pdo= new PDO('mysql:host=localhost;dbname=register','root','');
-				$sql='SELECT email FROM users WHERE id={$_SESSION["id"]}';
+				$sql='SELECT role FROM users WHERE id=:id';
 				$statement=$pdo->prepare($sql);
-				$statement->execute();
-				$st=$statement->fetch(PDO::FETCH_ASSOC);
-				return $st;
+				$statement->execute(['id'=>$_SESSION['id']]);
+				$now_id=$statement->fetch(PDO::FETCH_ASSOC);
+				return $now_id;
+}
+
+
+function is_not_login_and_admin($name,$role){if($_SESSION[$name][$role]==null){redirect_to('page_login.php');}}
+
+
+function edit_information($user_name,$telephone,$location,$work,$last_id){$pdo= new PDO('mysql:host=localhost; dbname=register','root','');
+							$sql='INSERT INTO user_information(id,user_name,telephone,location,work) VALUES (:id,:user_name,:telephone,:location,:work)';
+							$statement=$pdo->prepare($sql);
+							$edit=$statement->execute(['user_name'=>$user_name,
+												'telephone'=>$telephone,
+												'location'=>$location,
+												'work'=>$work,
+												'id'=>$last_id]);
+							return $edit;
+
+}
+
+function add_social_link($telegram,$instagram,$vk,$last_id){$pdo= new PDO('mysql:host=localhost;dbname=register','root','');
+															$sql='INSERT INTO user_social_link(id,telegram,instagram,vk) VALUES (:id,:telegram,:instagram,:vk)';
+															$statement=$pdo->prepare($sql);
+															$edit_link=$statement->execute(['telegram'=>$telegram,
+																							'instagram'=>$instagram,
+																							'vk'=>$vk,
+																							'id'=>$last_id]);
+
+}
+
+
+function set_status($select,$last_id){$pdo= new PDO('mysql:host=localhost;dbname=register','root','');
+								$sql='UPDATE users SET status=:status WHERE id=:id';
+								$statement=$pdo->prepare($sql);
+								$statement->execute(['id'=>$last_id,
+													'status'=>$select]);
+
+}
+
+
+function upload_avatar($avatar,$last_id){
+										if(is_uploaded_file($avatar['tmp_name'])){ $filename=$avatar['name'];
+																							$ext=pathinfo($filename, PATHINFO_EXTENSION);
+																							$ext=uniqid();
+
+																		move_uploaded_file($avatar['tmp_name'], 'upload/'.$ext.'.jpg');}
+
+																		$pdo= new PDO('mysql:host=localhost;dbname=register', 'root', '');
+																		$sql='UPDATE users SET img=:avatar WHERE id=:id';
+																		$statement=$pdo->prepare($sql);
+																		$statement->execute(['id'=>$last_id,
+																							'avatar'=>$avatar['name']]);
+
+
+
+
 }
 
 
