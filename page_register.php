@@ -63,7 +63,7 @@
                                 <div class="card p-4 rounded-plus bg-faded">
 
                                    <?php displey_flash_message("danger");?>
-
+                                  
 
                                     <form id="js-login" novalidate="" action="register.php" method="post">
                                         <div class="form-group">

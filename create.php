@@ -29,13 +29,7 @@ require 'function.php';
 
 	$filename=$_FILES['avatar']['name'];
 
-	//$filename=$_FILES['avatar']['tmp_name'];
-
-	//$destination='upload/'.rand(000000000,999999999).'.jpg';
-
-	var_dump($avatar);
-
-
+	$filename=$avatar['name'];
 
 	$peopls=get_user_by_email($email);
 
@@ -49,24 +43,26 @@ require 'function.php';
 				}
 
 
+	$user_id=add_user($email,$password,$role);
 
-	$last_id=add_user($email,$password,$role);
+	$edit=edit_information($user_name,$telephone,$location,$work,$user_id);
 
-	set_flash_message('success','Ура,регистрация нового пользователя произошла успешно');
+	$status=set_status($select,$user_id);
 
+	upload_avatar($avatar,$user_id);
 
-	$edit=edit_information($user_name,$telephone,$location,$work,$last_id);
+	add_social_link($telegram,$instagram,$vk,$user_id);
 
-	//var_dump($edit);
+	set_flash_message('success','Пользователь добавлен');
 
-	add_social_link($telegram,$instagram,$vk,$last_id);
-
-	$status=set_status($select,$last_id);
-
-
+	redirect_to('users.php');
 
 
-	upload_avatar($avatar,$last_id);
+
+
+
+
+
 
 
 

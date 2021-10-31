@@ -1,8 +1,7 @@
 <?php session_start();?>
 <?php require "function.php";?>
-<?php is_not_login_and_admin("login","role");?>
-<?php// is_not_login('id')?>
-
+<?php if($_SESSION['login']['role']==null){redirect_to('page_login.php');}?>
+<?php displey_flash_message('success');?>
 
 
 <!DOCTYPE html>
@@ -110,9 +109,12 @@
                                 <div class="form-group">
                                     <label class="form-label" for="example-select">Выберите статус</label>
                                     <select name="select" class="form-control" id="example-select" >
-                                        <option>Онлайн</option>
-                                        <option>Отошел</option>
-                                        <option>Не беспокоить</option>
+                                        <?php $status=['online'=>'Онлайн',
+                                                                'away'=>'Отошел',
+                                                                'busy'=>'Не беспокоить'];?>
+                                        <?php foreach($status as $key=>$text):?>
+                                        <option value="<?php echo $key;?>"><?php echo $text;?></option>
+                                        <?php endforeach;?>
                                     </select>
                                 </div>
 

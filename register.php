@@ -10,6 +10,7 @@ $password=$_POST['password'];
 $peopls=get_user_by_email($email);
 
 
+
 if(!empty($peopls)){
 					set_flash_message('danger','Такой адрес уже зарегистрирован');
 
@@ -22,10 +23,12 @@ if(!empty($peopls)){
 
 
 
-add_user($email, $password);
+add_user($email, $password, $role);
 
 
 					set_flash_message('success','Поздравляю,регистрация прошла успешно');
+
+
 
 redirect_to("page_login.php");
 exit;
